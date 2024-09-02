@@ -1,13 +1,12 @@
-// src/components/Header.js
 import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import logo from './karirpath.png';
-import { useNavigate } from 'react-router-dom';
 
-function Header() {
+const Header = ({ isLoggedIn }) => {
     const navigate = useNavigate();
 
     const handleSignInClick = () => {
-        navigate('/signin'); // Redirect to the Sign In page
+        navigate('/signin'); 
     };
 
     return (
@@ -15,17 +14,21 @@ function Header() {
             <div style={styles.logoNavContainer}>
                 <img src={logo} alt="karirpath-logo" style={styles.logo} />
                 <nav style={styles.nav}>
-                    <a href="#" style={styles.navLink}>Find Jobs</a>
-                    <a href="#" style={styles.navLink}>Your Jobs</a>
+                    <Link to="/" style={styles.navLink}>Find Jobs</Link>
+                    <Link to="/my-jobs" style={styles.navLink}>Your Jobs</Link>
                 </nav>
             </div>
             <div style={styles.authButtons}>
-                <button onClick={handleSignInClick} style={styles.signInButton}>Sign In</button>
+                {isLoggedIn ? (
+                    <Link to="/profile" style={styles.navLink}>My Profile</Link>
+                ) : (
+                    <button onClick={handleSignInClick} style={styles.signInButton}>Sign In</button>
+                )}
                 <button style={styles.partnerButton}>Be a Partner</button>
             </div>
         </header>
     );
-}
+};
 
 const styles = {
     header: {
@@ -41,7 +44,7 @@ const styles = {
         alignItems: 'center',
         margin: 0,
         padding: 0,
-      },
+    },
     logo: {
         width: '80px',
         margin: 0,
@@ -54,13 +57,13 @@ const styles = {
     },
     navLink: {
         textDecoration: 'none',
-        color: '#fff',  
+        color: '#fff',
         fontSize: '18px',
         lineHeight: '1',
         margin: 0,
         padding: 0,
-        fontFamily: "'Hammersmith One', sans-serif",  
-      },
+        fontFamily: "'Hammersmith One', sans-serif",
+    },
     authButtons: {
         display: 'flex',
         gap: '10px',

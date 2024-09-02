@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import logo from './karirpath.png';
 import bookmarkIcon from './bookmark-icon.png';
+import { useNavigate } from 'react-router-dom';
 
+// Correct HomePage component
 function HomePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
     const [recentSearches, setRecentSearches] = useState(['Search 1', 'Search 2', 'Search 3', 'Search 4']);
 
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+      };
+
+      
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
     };
-
+    
     const handleSearch = () => {
         if (searchQuery.trim() !== '') {
             setRecentSearches([...recentSearches, searchQuery]);
@@ -29,7 +36,20 @@ function HomePage() {
         const updatedSearches = recentSearches.filter((_, i) => i !== index);
         setRecentSearches(updatedSearches);
     };
-    
+
+    const courseCard = [
+        { title: 'Course 1', description: 'Introduction to Web Development' },
+        { title: 'Course 2', description: 'Advanced JavaScript Techniques' },
+        { title: 'Course 3', description: 'AI and Machine Learning Basics' },
+        { title: 'Course 4', description: 'Mastering React' }
+    ];
+
+    const articles = [
+        { title: 'Jobs Predicted to Rise in 2024, According To Experts', link: '#', id: 1 },
+        { title: 'AI is Revolutionizing Job Markets: Here\'s What You Need to Know', link: '#', id: 2 },
+    ];
+
+    const navigate = useNavigate();
 
     return (
         <div style={styles.container}>
@@ -82,7 +102,6 @@ function HomePage() {
                                     <button style={styles.filterButton}>My Jobs</button>
                                 </div>
                                 <div style={styles.mapContainer}>
-                                    {/* Map component or placeholder goes here */}
                                     <div style={styles.mapPlaceholder}>Map of Jakarta Jobs</div>
                                 </div>
                                 <div style={styles.jobItems}>
@@ -114,17 +133,14 @@ function HomePage() {
                                     <button style={styles.filterButton}>By City</button>
                                     <button style={styles.filterButton}>My Jobs</button>
                                 </div>
-                                {/* Bar Chart placeholder */}
                                 <div style={styles.chartPlaceholder}>Bar Chart of Popular Jobs</div>
                             </div>
                         </section>
-
 
                         <section style={styles.trendsSection}>
                             <div style={styles.trendsContainer}>
                                 <h2 style={styles.chartTitle}>AI-Generated Job Trend Detector</h2>
                                 <div style={styles.mapContainer}>
-                                    {/* Map component or placeholder goes here */}
                                     <div style={styles.graphPlaceholder}>Line Graph</div>
                                 </div>
                             </div>
@@ -132,29 +148,24 @@ function HomePage() {
 
                         <section style={styles.articlesCoursesSection}>
                             <div style={styles.articlesContainer}>
-                                <h2 styles={styles.articlesCoursesText}>Articles</h2>
-                                    <div style={styles.articleCard}>
-                                        <h4>Jobs Predicted to Rise in 2024, According To Experts</h4>
-                                        <button>Read More</button>
-                                    </div>
-                                    <div style={styles.articleCard}>
-                                        <h4>Jobs Predicted to Rise in 2024, According To Experts</h4>
-                                        <button>Read More</button>
-                                    </div>
-                                    <button style={styles.viewMoreButton}>View More</button>
+                                <h2 style={styles.articlesCoursesText}>Articles</h2>
+                                <div style={styles.articleGrid}>
+                                    {articles.map((article) => (
+                                        <div key={article.id} style={styles.articleCard}>
+                                            <div style={styles.articleRow}>
+                                                <div style={styles.imagePlaceholder}></div>
+                                                <h4 style={styles.articleTitle}>{article.title}</h4>
+                                            </div>
+                                            <button style={styles.readMoreButton}>Read More</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button style={styles.viewMoreButton}>View More</button>
                             </div>
 
-                            <div style={styles.coursesContainer}>
-                                <h2 styles={styles.articlesCoursesText}>Courses For You</h2>
-                                <button class="prev">&#8249;</button>
-                            <div style={styles.courseCard}>
-                                <h4>Course Title</h4>
-                                <p>Level</p>
-                                <p>Duration</p>
-                                <p>Rating</p>
-                                <button>Go to Website</button>
-                            </div>
-                            <button class="next">&#8250;</button>
+                            <div style={styles.articlesContainer}>
+                                <h2 style={styles.articlesCoursesText}>Courses</h2>
+                                <CourseCarousel courseCard={courseCard} />
                             </div>
                         </section>
                     </main>
@@ -214,6 +225,37 @@ function HomePage() {
         </div>
     );
 }
+
+const CourseCarousel = ({ courseCard }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const prevSlide = () => {
+        setCurrentIndex(currentIndex === 0 ? courseCard.length - 1 : currentIndex - 1);
+    };
+
+    const nextSlide = () => {
+        setCurrentIndex(currentIndex === courseCard.length - 1 ? 0 : currentIndex + 1);
+    };
+
+    return (
+        <div style={styles.carouselContainer}>
+            <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevSlide}>
+                &lt;
+            </button>
+            <div style={{ ...styles.coursesContainer, transform: `translateX(-${currentIndex * 300}px)` }}>
+                {courseCard.map((course, index) => (
+                    <div key={index} style={styles.courseItem}>
+                        <h3>{course.title}</h3>
+                        <p>{course.description}</p>
+                    </div>
+                ))}
+            </div>
+            <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextSlide}>
+                &gt;
+            </button>
+        </div>
+    );
+};
 
 const styles = {
     container: {
@@ -480,9 +522,9 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         border: 'none',
-        padding: '8px 15px',
-        backgroundColor: '#1A7270',
-        color: '#000',
+        padding: '10px 20px',
+        textAlign: 'center',
+        marginTop: '20px',
     },
     chartPlaceholder: {
         flex: 1,  
@@ -506,23 +548,30 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between', 
         gap: '20px', 
-        marginTop: '20px',
         width: '100%', 
-        flexWrap: 'wrap', 
-        padding: '20px',
-        gap: '20px',  
-        boxSizing: 'border-box',
+        flexWrap: 'nowrap', 
+        padding: '10px',  
+        textAlign: 'center',
     },
     articlesContainer: {
-        flex: 1,
         display: 'flex',
-        flexDirection: 'column',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: '20px',
         backgroundColor: 'transparent',
         border: '1px solid #fff',
         padding: '20px',
         borderRadius: '10px',
-        color: '#000',
-        minHeight: '300px',
+        width: '100%',
+        marginBottom: '20px',
+    },
+    carouselContainer: {
+        position: 'relative',
+        width: '100%',
+        overflow: 'hidden',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     coursesContainer: {
         flex: 1, 
@@ -532,8 +581,8 @@ const styles = {
         border: '1px solid #fff',
         padding: '20px',
         borderRadius: '10px',
-        color: '#000',
         minHeight: '300px',
+        transition: 'transform 0.5s ease-in-out',
     },
     aiJobTrend: {
         backgroundColor: '#01212E',
@@ -567,32 +616,85 @@ const styles = {
         marginBottom: '5px', 
         marginTop: '0',
     },
-    courses: {
-        backgroundColor: '#01212E',
-        padding: '20px',
-        border: '2px solid #FFFFFF',
-    },
     sectionTitle: {
         fontSize: '24px',
         marginBottom: '20px',
     },
+    articleGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '20px',
+        marginBottom: '10px',
+    },
+    articleRow: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '15px',
+    },
     articleCard: {
-        backgroundColor: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexDirection: 'column',
+        width: '350px',
+        padding: '10px',
+        backgroundColor: '#fff',
         color: '#000',
-        padding: '15px',
         margin: '10px 0',
         borderRadius: '10px',
         textAlign: 'left',
+        border: '1px solid #000',
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+    },
+    articleTitle: {
+        width: '50%',
+        fontSize: '20px',
+        fontWeight: 'bold',
+        textAlign: 'left',
+        marginRight: '10px',
+    },
+    imagePlaceholder: {
+        width: '50%',
+        height: '100%',
+        backgroundColor: '#f0f0f0',
+        marginRight: '10px',
+        flexShrink: 1,
+    },
+    readMoreButton: {
+        display: 'inline-block',
+        marginTop: '10px',
+        backgroundColor: '#000',
+        fontSize: '14px',
+        color: '#fff',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        width: '100%',
+        fontFamily: "'Hammersmith One', sans-serif",
+    },
+    jobCard: {
+        background: 'linear-gradient(180deg, #1A7270, #31D8D4)',
+        borderRadius: '10px',
+        padding: '20px',
+        color: '#FFFFFF',
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        position: 'relative',
+        overflow: 'hidden',
     },
     courseCard: {
         backgroundColor: '#FFFFFF',
         color: '#000',
         padding: '20px',
-        margin: '10px 0',
         borderRadius: '10px',
         textAlign: 'left',
         display: 'inline-block',
         width: '80%',
+        minWidth: '300px',
+        margin: '0 20px', 
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
     },
     button: {
         backgroundColor: '#0C5A5A',
@@ -603,14 +705,26 @@ const styles = {
         marginTop: '10px',
         cursor: 'pointer',
     },
-    arrowButton: {
-        backgroundColor: '#0C5A5A',
-        color: '#FFFFFF',
+    carouselButton: {
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        backgroundColor: '#1A7270',
         border: 'none',
-        padding: '10px',
-        borderRadius: '5px',
-        margin: '20px 10px',
+        borderRadius: '50%', 
+        width: '40px',
+        height: '40px',
+        color: '#fff',
         cursor: 'pointer',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    leftButton: {
+        left: '10px',  // Position to the left
+    },
+    rightButton: {
+        right: '10px',  // Position to the right
     },
     footer: {
         textAlign: 'center',
@@ -618,7 +732,7 @@ const styles = {
         padding: '10px 0',
     },
     logo: {
-        width: '80px',
+        width: '50px',
         margin: 0,
         padding: 0,
     },

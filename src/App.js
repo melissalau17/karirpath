@@ -4,6 +4,9 @@ import Header from './Header';
 import SignInForm from './SignInForm';
 import RegisterForm from './RegisterForm';
 import HomePage from './HomePage';
+import JobResultsPage from './JobResultsPage';
+import ProfilePage from './ProfilePage';
+import JobsPage from './JobsPage';
 
 function App() {
     return (
@@ -15,11 +18,14 @@ function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/signin" element={<SignInForm />} />
                         <Route path="/signup" element={<RegisterForm />} />
+                        <Route path="/jobs/:jobTitle" element={<JobResultsPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/my-jobs" element={<JobsPage />} />
                     </Routes>
                 </div>
             </div>
         </Router>
-    );
+    )
 }
 
 const styles = {

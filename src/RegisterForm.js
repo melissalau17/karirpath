@@ -1,6 +1,7 @@
-// src/components/RegisterForm.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Image from './connect-you.png';
+import axios from 'axios';
 
 function RegisterForm() {
     const [isChecked, setIsChecked] = useState(false);
@@ -9,15 +10,57 @@ function RegisterForm() {
         setIsChecked(!isChecked);
     };
 
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
+
+    const [error, setError] = useState('');
+
+    const navigate = useNavigate();
+    const handleInputChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (!isChecked) {
+            setError('You must agree to the terms and conditions');
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/signup', formData);
+
+            if (response.data.success) {
+                navigate('/verify-email');
+            }
+        } catch (err) {
+            setError('Error during registration. Please try again.');
+        }
+    };
+
     return (
         <div style={styles.container}>
             <div style={styles.formSection}>
                 <h1 style={styles.heading}>Make a Difference</h1>
-                <form style={styles.form}>
-                    <input type="text" placeholder="Full Name" style={styles.input} />
-                    <input type="email" placeholder="Email" style={styles.input} />
-                    <input type="password" placeholder="Password" style={styles.input} />
-                    <input type="password" placeholder="Confirm Password" style={styles.input} />
+                {error && <p style={styles.error}>{error}</p>}
+                <form style={styles.form} onSubmit={handleSubmit}>
+                    <input type="text" placeholder="Full Name" value={formData.fullName} onChange={handleInputChange} style={styles.input} />
+                    <input type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} style={styles.input} />
+                    <input type="password" placeholder="Password" value={formData.password} onChange={handleInputChange} style={styles.input} />
+                    <input type="password" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} style={styles.input} />
                     <div style={styles.checkboxContainer}>
                         <input
                             type="checkbox"
@@ -112,6 +155,10 @@ const styles = {
     image: {
         maxWidth: '100%',
         height: 'auto',
+    },
+    error: {
+        color: 'red',
+        marginBottom: '10px',
     },
 };
 
