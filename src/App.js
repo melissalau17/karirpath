@@ -29,7 +29,6 @@ function App() {
 }
 
 const styles = {
-<<<<<<< HEAD
     container: {
         display: 'flex',
         flexDirection: 'column',
@@ -49,7 +48,7 @@ const styles = {
         padding: 0,
         width: '100%',
     },
-=======
+
 	container: {
 		display: "flex",
 		flexDirection: "column",
@@ -63,7 +62,6 @@ const styles = {
 	mainContent: {
 		display: "flex",
 	},
->>>>>>> 2963532b5b7bd68c332b3cd2a19dd81482b2485f
 };
 
 export default App;
