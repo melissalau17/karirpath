@@ -57,10 +57,10 @@ function RegisterForm() {
                 <h1 style={styles.heading}>Make a Difference</h1>
                 {error && <p style={styles.error}>{error}</p>}
                 <form style={styles.form} onSubmit={handleSubmit}>
-                    <input type="text" placeholder="Full Name" value={formData.fullName} onChange={handleInputChange} style={styles.input} />
-                    <input type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} style={styles.input} />
-                    <input type="password" placeholder="Password" value={formData.password} onChange={handleInputChange} style={styles.input} />
-                    <input type="password" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} style={styles.input} />
+                    <input type="text" placeholder="Full Name" onChange={handleInputChange} style={styles.input} />
+                    <input type="email" placeholder="Email" onChange={handleInputChange} style={styles.input} />
+                    <input type="password" placeholder="Password" onChange={handleInputChange} style={styles.input} />
+                    <input type="password" placeholder="Confirm Password" onChange={handleInputChange} style={styles.input} />
                     <div style={styles.checkboxContainer}>
                         <input
                             type="checkbox"

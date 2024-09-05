@@ -5,7 +5,6 @@ const JobsPage = () => {
         <div>
             <h1>Your Jobs</h1>
             <div>
-                {/* Example of Job Status */}
                 <JobStatus title="Web Designer" company="TechCorp" status="Applied" />
                 <JobStatus title="UI/UX Designer" company="DesignHub" status="In Progress" />
             </div>

@@ -160,7 +160,9 @@ function HomePage() {
                                         </div>
                                     ))}
                                 </div>
-                                <button style={styles.viewMoreButton}>View More</button>
+                                <div style={styles.viewMoreButtonContainer}>
+                                    <button style={styles.viewMoreButton}>View More</button>
+                                </div>
                             </div>
 
                             <div style={styles.articlesContainer}>
@@ -242,9 +244,15 @@ const CourseCarousel = ({ courseCard }) => {
             <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevSlide}>
                 &lt;
             </button>
-            <div style={{ ...styles.coursesContainer, transform: `translateX(-${currentIndex * 300}px)` }}>
+            <div style={styles.coursesContainer}>
                 {courseCard.map((course, index) => (
-                    <div key={index} style={styles.courseItem}>
+                    <div
+                        key={index}
+                        style={{
+                            ...styles.courseItem,
+                            display: currentIndex === index ? 'block' : 'none',
+                        }}
+                    >
                         <h3>{course.title}</h3>
                         <p>{course.description}</p>
                     </div>
@@ -267,7 +275,8 @@ const styles = {
         fontFamily: "'Hammersmith One', sans-serif",
         backgroundColor: '#01212E',
         color: '#fff',
-        padding: '15px'
+        padding: '15px',
+        margin: 0,
     },
     main: {
         flex: 1,
@@ -276,7 +285,6 @@ const styles = {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
     },
     heroSection: {
         fontSize: '30px',
@@ -401,7 +409,7 @@ const styles = {
     },
     jobItems: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', // Responsive layout
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
         gap: '20px',
         padding: '20px',
     },
@@ -522,27 +530,47 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         border: 'none',
-        padding: '10px 20px',
+        padding: '8px 15px',
         textAlign: 'center',
-        marginTop: '20px',
     },
     chartPlaceholder: {
         flex: 1,  
         backgroundColor: '#ccc', 
         borderRadius: '10px',
     },    
+    trendsSection: {
+        width: '100vw', 
+        margin: '0', 
+        padding: '0', 
+        boxSizing: 'border-box',
+    },
     trendsContainer: {
-        marginTop: '30px',
+        margin: '30px 20px 0 20px',
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'transparent',
         border: '1px solid #fff',
-        padding: '20px',
+        padding: '0 20px',
         borderRadius: '10px',
         color: '#000',
         alignItems: 'center',
-        width: '100%',
+        width: 'calc(100% - 40px)',
         boxSizing: 'border-box',
+        overflow: 'hidden',
+    },
+    chartTitle: {
+        textAlign: 'center',
+        margin: '20px',
+        color: '#fff',
+    },
+    graphPlaceholder: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff', 
+        border: '1px solid #ddd', 
     },
     articlesCoursesSection: {
         display: 'flex',
@@ -557,13 +585,15 @@ const styles = {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: '20px',
+        gap: '10px',
         backgroundColor: 'transparent',
         border: '1px solid #fff',
-        padding: '20px',
+        padding: '10px',
         borderRadius: '10px',
         width: '100%',
-        marginBottom: '20px',
+        marginBottom: '10px',
+        boxSizing: 'border-box',
+        height: '100%',
     },
     carouselContainer: {
         position: 'relative',
@@ -573,16 +603,28 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
     },
+    courseItem: {
+        width: '50%',
+        textAlign: 'center',
+        backgroundColor: '#fff',
+        color: '#000',
+        padding: '20px',
+        borderRadius: '10px',
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+        transition: 'opacity 0.5s ease-in-out',
+    },
     coursesContainer: {
         flex: 1, 
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'transparent',
-        border: '1px solid #fff',
-        padding: '20px',
         borderRadius: '10px',
         minHeight: '300px',
         transition: 'transform 0.5s ease-in-out',
+        boxSizing: 'border-box',
+        width: 'calc(100% - 40px)%',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     aiJobTrend: {
         backgroundColor: '#01212E',
@@ -613,33 +655,33 @@ const styles = {
     articlesCoursesText: {
         color: '#fff',
         fontSize: '25px',
-        marginBottom: '5px', 
+        marginBottom: '0',
         marginTop: '0',
     },
     sectionTitle: {
         fontSize: '24px',
-        marginBottom: '20px',
+        marginBottom: '10px',
     },
     articleGrid: {
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '20px',
+        gap: '10px',
         marginBottom: '10px',
     },
     articleRow: {
         display: 'flex',
         alignItems: 'center',
-        marginBottom: '15px',
+        marginBottom: '5px',
     },
     articleCard: {
         display: 'flex',
-        alignItems: 'flex-start',
         flexDirection: 'column',
-        width: '350px',
+        justifyContent: 'space-between',
+        width: '320px',
         padding: '10px',
         backgroundColor: '#fff',
         color: '#000',
-        margin: '10px 0',
+        margin: '0',
         borderRadius: '10px',
         textAlign: 'left',
         border: '1px solid #000',
@@ -651,17 +693,17 @@ const styles = {
         fontWeight: 'bold',
         textAlign: 'left',
         marginRight: '10px',
+        marginBottom: '10px',
     },
     imagePlaceholder: {
         width: '50%',
-        height: '100%',
+        height: '200px',
         backgroundColor: '#f0f0f0',
         marginRight: '10px',
-        flexShrink: 1,
+        flexShrink: 0,
     },
     readMoreButton: {
-        display: 'inline-block',
-        marginTop: '10px',
+        marginTop: 'auto',
         backgroundColor: '#000',
         fontSize: '14px',
         color: '#fff',
@@ -696,15 +738,6 @@ const styles = {
         margin: '0 20px', 
         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
     },
-    button: {
-        backgroundColor: '#0C5A5A',
-        color: '#FFFFFF',
-        border: 'none',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        marginTop: '10px',
-        cursor: 'pointer',
-    },
     carouselButton: {
         position: 'absolute',
         top: '50%',
@@ -719,12 +752,13 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        zIndex: 1,
     },
     leftButton: {
-        left: '10px',  // Position to the left
+        left: '10px',
     },
     rightButton: {
-        right: '10px',  // Position to the right
+        right: '10px', 
     },
     footer: {
         textAlign: 'center',

@@ -32,6 +32,9 @@ const styles = {
     container: {
         display: 'flex',
         flexDirection: 'column',
+        width: '100%',
+        maxWidth: 'none',
+        padding: 0,
     },
     header: {
         width: '100%',
@@ -41,6 +44,9 @@ const styles = {
     },
     mainContent: {
         display: 'flex',
+        margin: 0,
+        padding: 0,
+        width: '100%',
     },
 };
 
