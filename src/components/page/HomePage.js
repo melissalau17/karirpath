@@ -7,7 +7,6 @@ import { supabase } from "../../App";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 function HomePage() {
-<<<<<<< HEAD
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
     const [recentSearches, setRecentSearches] = useState([
@@ -16,10 +15,7 @@ function HomePage() {
         "Search 3",
         "Search 4",
     ]);
-=======
-	const [searchQuery, setSearchQuery] = useState("");
-	const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
-	const [recentSearches, setRecentSearches] = useState([]);
+
 	const geminiApi = process.env.REACT_APP_GEMINI_API_KEY;
 	const genAI = new GoogleGenerativeAI(geminiApi);
 	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -34,7 +30,6 @@ function HomePage() {
 		generationConfig,
 		history: [],
 	});
->>>>>>> 6b082f0357b8da5c6e46a73c990ebcf8464c76b5
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -44,14 +39,6 @@ function HomePage() {
         setSearchQuery(event.target.value);
     };
 
-<<<<<<< HEAD
-    const handleSearch = () => {
-        if (searchQuery.trim() !== "") {
-            setRecentSearches([...recentSearches, searchQuery]);
-            setSearchQuery("");
-        }
-    };
-=======
 	const handleSearch = async () => {
 		if (searchQuery.trim() !== "") {
 			setRecentSearches([...recentSearches, searchQuery]);
@@ -79,7 +66,6 @@ function HomePage() {
 			console.log(dataResult);
 		}
 	};
->>>>>>> 6b082f0357b8da5c6e46a73c990ebcf8464c76b5
 
     const handleKeyDown = (event) => {
         if (event.key === "Enter") {
@@ -262,7 +248,14 @@ function HomePage() {
                                         <span>{courseCard[currentIndex].duration}</span>
                                         <span>{courseCard[currentIndex].rating}</span>
                                     </div>
-                                    <button style={styles.button}>Go to Website</button>
+                                    <div style={styles.courseFooter}>
+                                        <button style={styles.button}>Go to Website</button>
+                                        <img
+                                            src={bookmarkIcon}
+                                            alt="Bookmark"
+                                            style={styles.bookmarkIcon}
+                                        />
+                                    </div>
                                 </div>
                                 <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextCourse}>
                                     {">"}
@@ -471,7 +464,7 @@ const styles = {
     },
     jobItems: {
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", // Responsive layout
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", 
         gap: "20px",
         padding: "20px",
     },
@@ -521,6 +514,11 @@ const styles = {
         fontSize: "14px",
     },
     jobFooter: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    courseFooter: {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
