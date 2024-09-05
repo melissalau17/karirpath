@@ -3,17 +3,28 @@ import { FaSearch } from "react-icons/fa";
 import logo from "../../assets/karirpath.png";
 import bookmarkIcon from "../../assets/bookmark-icon.png";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../../App";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Correct HomePage component
 function HomePage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
-	const [recentSearches, setRecentSearches] = useState([
-		"Search 1",
-		"Search 2",
-		"Search 3",
-		"Search 4",
-	]);
+	const [recentSearches, setRecentSearches] = useState([]);
+	const geminiApi = process.env.REACT_APP_GEMINI_API_KEY;
+	const genAI = new GoogleGenerativeAI(geminiApi);
+	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+	const generationConfig = {
+		temperature: 0,
+		topP: 0.95,
+		topK: 64,
+		maxOutputTokens: 8192,
+		responseMimeType: "text/plain",
+	};
+	const chatSession = model.startChat({
+		generationConfig,
+		history: [],
+	});
 
 	const handleSearchChange = (e) => {
 		setSearchQuery(e.target.value);
@@ -23,10 +34,31 @@ function HomePage() {
 		setSearchQuery(event.target.value);
 	};
 
-	const handleSearch = () => {
+	const handleSearch = async () => {
 		if (searchQuery.trim() !== "") {
 			setRecentSearches([...recentSearches, searchQuery]);
 			setSearchQuery("");
+			const SCHEMA = `CREATE TABLE  public."Country" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NULL,    alpha_2 TEXT NULL,    alpha_3 TEXT NULL,    country_code INTEGER NULL,    iso_3166_2 TEXT NULL,    region TEXT NULL,    sub_region TEXT NULL,    intermediate_region TEXT NULL,    region_code INTEGER NULL,    sub_region_code INTEGER NULL,    intermediate_region_code INTEGER NULL,    CONSTRAINT country_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Industry" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT industry_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Job" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    title TEXT NULL,    description TEXT NULL,    salary_min TEXT NULL,    salary_max TEXT NULL,    id_location BIGINT NULL,    ROLE TEXT NULL,    id_roleclass BIGINT NULL,    id_workplacement BIGINT NULL,    id_worktype BIGINT NULL,    date TIMESTAMP WITH TIME ZONE NULL,    id_industry BIGINT NULL,    id_joblevel BIGINT NULL,    link TEXT NULL,    CONSTRAINT job_pkey PRIMARY KEY (id),    CONSTRAINT job_id_joblevel_fkey FOREIGN KEY (id_joblevel) REFERENCES "JobLevel" (id),    CONSTRAINT job_id_roleclass_fkey FOREIGN KEY (id_roleclass) REFERENCES "RoleClass" (id),    CONSTRAINT job_id_industry_fkey FOREIGN KEY (id_industry) REFERENCES "Industry" (id),    CONSTRAINT job_id_worktype_fkey FOREIGN KEY (id_worktype) REFERENCES "WorkType" (id),    CONSTRAINT job_location_fkey FOREIGN KEY (id_location) REFERENCES "Location" (id) ON UPDATE CASCADE,    CONSTRAINT job_id_workplacement_fkey FOREIGN KEY (id_workplacement) REFERENCES "WorkPlacement" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."JobLevel" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT joblevel_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Location" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    city TEXT NOT NULL,    id_province BIGINT NULL,    id_country BIGINT NULL,    CONSTRAINT location_pkey PRIMARY KEY (id),    CONSTRAINT location_id_country_fkey FOREIGN KEY (id_country) REFERENCES "Country" (id),    CONSTRAINT location_id_province_fkey FOREIGN KEY (id_province) REFERENCES "Province" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Province" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT province_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default; TABLESPACE pg_default;CREATE TABLE  public."WorkPlacement" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NOT NULL,    CONSTRAINT workplacement_pkey PRIMARY KEY (id)  )`;
+			const RULES = `RULES:
+                            1. Output only supabase posgresql query
+                            2. minimum limit is 5 if asked. never use limit if not.
+                            3. always use LIKE and LOWER operator for string matching.
+                            4. Table name and column name write with double quotation mark
+                            5. Maximum where operator is 5
+                            6. always using SELECT id, title, description, salary_min, salary_max, id_location, id_workplacement, id_worktype, date , id_joblevel, link`;
+			let QUESTION = `QUESTION${searchQuery}`;
+			const generatedQuery = await chatSession.sendMessage(
+				`${SCHEMA} \n ${RULES} \n ${QUESTION}`
+			);
+			let queryText = generatedQuery.response.text();
+			queryText = queryText.replace(/```/g, "");
+			queryText = queryText.replace("sql", "");
+			console.log(queryText);
+			const dataResult = await supabase.rpc("rcp_execute_sql", {
+				query: queryText,
+			});
+
+			console.log(dataResult);
 		}
 	};
 

@@ -1,4 +1,3 @@
-// src/components/SignInForm.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Image from "../../assets/connect-you.png";
@@ -23,8 +22,7 @@ function SignInPage() {
 					</a>
 					<a href="/signup" style={styles.signUpLink}>
 						Sign Up
-					</a>{" "}
-					{/* Added Sign Up link */}
+					</a>
 					<button type="submit" style={styles.button}>
 						Sign In
 					</button>
@@ -57,7 +55,7 @@ const styles = {
 		fontFamily: "'Hammersmith One', sans-serif",
 	},
 	heading: {
-		color: "#fff", // Ensure heading color contrasts with background
+		color: "#fff",
 	},
 	form: {
 		display: "flex",

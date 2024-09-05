@@ -7,7 +7,12 @@ import JobResultsPage from "./components/page/JobResultsPage";
 import JobsPage from "./components/page/JobsPage";
 import Header from "./components/ui/Header";
 import ProfilePage from "./components/page/ProfilePage";
+import { createClient } from "@supabase/supabase-js";
 
+export const supabase = createClient(
+	"https://xuufthgrikirrjowtzzy.supabase.co/",
+	process.env.REACT_APP_SUPABASE_KEY
+);
 function App() {
 	return (
 		<Router>
@@ -29,25 +34,25 @@ function App() {
 }
 
 const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        maxWidth: 'none',
-        padding: 0,
-    },
-    header: {
-        width: '100%',
-        backgroundColor: '#01212E', 
-        color: '#fff',
-        textAlign: 'center',
-    },
-    mainContent: {
-        display: 'flex',
-        margin: 0,
-        padding: 0,
-        width: '100%',
-    },
+	container: {
+		display: "flex",
+		flexDirection: "column",
+		width: "100%",
+		maxWidth: "none",
+		padding: 0,
+	},
+	header: {
+		width: "100%",
+		backgroundColor: "#01212E",
+		color: "#fff",
+		textAlign: "center",
+	},
+	mainContent: {
+		display: "flex",
+		margin: 0,
+		padding: 0,
+		width: "100%",
+	},
 
 	container: {
 		display: "flex",
