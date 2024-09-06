@@ -60,24 +60,28 @@ function RegisterPage() {
 					<input
 						type="text"
 						placeholder="Full Name"
+						value={formData.fullName}
 						onChange={handleInputChange}
 						style={styles.input}
 					/>
 					<input
 						type="email"
 						placeholder="Email"
+						value={formData.email}
 						onChange={handleInputChange}
 						style={styles.input}
 					/>
 					<input
 						type="password"
 						placeholder="Password"
+						value={formData.password}
 						onChange={handleInputChange}
 						style={styles.input}
 					/>
 					<input
 						type="password"
 						placeholder="Confirm Password"
+						value={formData.confirmPassword}
 						onChange={handleInputChange}
 						style={styles.input}
 					/>
