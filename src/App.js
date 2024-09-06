@@ -8,6 +8,7 @@ import JobsPage from "./components/page/JobsPage";
 import Header from "./components/ui/Header";
 import ProfilePage from "./components/page/ProfilePage";
 import { createClient } from "@supabase/supabase-js";
+import TestPage from "./components/page/TestPage";
 
 export const supabase = createClient(
 	"https://xuufthgrikirrjowtzzy.supabase.co/",
@@ -26,6 +27,7 @@ function App() {
 						<Route path="/jobs/:jobTitle" element={<JobResultsPage />} />
 						<Route path="/profile" element={<ProfilePage />} />
 						<Route path="/my-jobs" element={<JobsPage />} />
+						<Route path="/test" element={<TestPage />} />
 					</Routes>
 				</div>
 			</div>
