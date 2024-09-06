@@ -9,8 +9,9 @@ import JobTrendChart from "../ui/charts/JobTrendChart";
 import GraduationTotalChart from "../ui/charts/GraduationTotalChart";
 import JobByLocationChart from "../ui/charts/JobByLocationChart";
 import JobCard from "../ui/JobCard";
+import ResultsPage from "../page/ResultsPage";
 
-// Correct HomePage component
+
 function HomePage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
@@ -68,6 +69,7 @@ function HomePage() {
 			console.log("dataResult.data");
 			console.log(dataResult);
 			setJobResult(dataResult.data);
+            navigate(`/results?query=${encodeURIComponent(searchQuery)}`);
 		}
 	};
 
@@ -82,12 +84,23 @@ function HomePage() {
 		setRecentSearches(updatedSearches);
 	};
 
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const nextCourse = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % courseCard.length);
+    };
+
+    const prevCourse = () => {
+        setCurrentIndex((prevIndex) =>
+            prevIndex === 0 ? courseCard.length - 1 : prevIndex - 1
+        );
+    };
+
 	const courseCard = [
-		{ title: "Course 1", description: "Introduction to Web Development" },
-		{ title: "Course 2", description: "Advanced JavaScript Techniques" },
-		{ title: "Course 3", description: "AI and Machine Learning Basics" },
-		{ title: "Course 4", description: "Mastering React" },
-	];
+        { title: "Course 1", level: "Beginner", duration: "2h", rating: "4.5/5" },
+        { title: "Course 2", level: "Intermediate", duration: "3h", rating: "4.7/5" },
+        { title: "Course 3", level: "Advanced", duration: "4h", rating: "4.8/5" },
+    ];
 
 	const articles = [
 		{
@@ -274,62 +287,45 @@ function HomePage() {
 								</div>
 							</div>
 
+							<div style={styles.coursesContainer}>
+                                <h2 style={styles.articlesCoursesText}>Courses For You</h2>
+                                <div style={styles.carouselContainer}>
+                                    <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevCourse}>
+                                        {"<"}
+                                    </button>
+                                    <div style={styles.carouselWrapper}>
+                                        <div style={styles.courseCard}>
+                                            <div style={styles.courseImagePlaceholder}></div>
+                                            <h2>{courseCard[currentIndex].title}</h2>
+                                            <div style={styles.courseInfo}>
+                                                <span>{courseCard[currentIndex].level}</span>
+                                                <span>{courseCard[currentIndex].duration}</span>
+                                                <span>{courseCard[currentIndex].rating}</span>
+                                            </div>
+                                            <div style={styles.courseFooter}>
+                                                <button style={styles.button}>Go to Website</button>
+                                                <img
+                                                    src={bookmarkIcon}
+                                                    alt="Bookmark"
+                                                    style={styles.bookmarkIcon}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextCourse}>
+                                        {">"}
+                                    </button>
+                                </div>
+                            </div>
 							<div style={styles.articlesContainer}>
 								<h2 style={styles.articlesCoursesText}>Courses</h2>
 								{courses && <CourseCarousel courseCard={courses} />}
 							</div>
 						</section>
 					</main>
-
-					<footer style={styles.footer}>
-						<img src={logo} alt="Footer Logo" />
-						<p>Copyright 2024 karirpath</p>
-					</footer>
 				</>
 			) : (
-				<div style={styles.resultsPage}>
-					<main style={styles.main}>
-						<section style={styles.resultsSection}>
-							<h1>Results for '{searchQuery}'</h1>
-							<div style={styles.searchBar}>
-								<input
-									type="text"
-									placeholder="Web Designer"
-									value={searchQuery}
-									onChange={handleSearchInputChange}
-									style={styles.input}
-								/>
-								<FaSearch onClick={handleSearch} style={styles.searchIcon} />
-							</div>
-
-							<section style={styles.jobOutlookSection}>
-								<p>
-									The web designer job is projected to grow <b>16%</b> from 2022
-									to 2032, faster than average. Around <b>19,000</b> openings
-									per year are projected.
-								</p>
-							</section>
-
-							<section style={styles.jobsSection}>
-								<h2>Search Jobs in Jakarta</h2>
-								<div style={styles.jobItems}>{/* Job items go here */}</div>
-								<div style={styles.viewMoreButtonContainer}>
-									<button style={styles.viewMoreButton}>View More</button>
-								</div>
-							</section>
-
-							<section style={styles.coursesSection}>
-								<h2>Courses For You</h2>
-								{/* Courses slider goes here */}
-							</section>
-						</section>
-					</main>
-
-					<footer style={styles.footer}>
-						<img src={logo} alt="Footer Logo" style={styles.logo} />
-						<p>Copyright &copy; 2024 karirpath</p>
-					</footer>
-				</div>
+				<ResultsPage />
 			)}
 		</div>
 	);
@@ -430,6 +426,7 @@ const styles = {
 		position: "relative",
 		display: "flex",
 		alignItems: "center",
+        width: "100%",
 	},
 	input: {
 		padding: "10px 40px 10px 20px",
@@ -607,8 +604,8 @@ const styles = {
 		fontFamily: "'Hammersmith One', sans-serif",
 	},
 	bookmarkIcon: {
-		width: "20px",
-		height: "20px",
+		width: "40px",
+		height: "40px",
 		cursor: "pointer",
 	},
 	filters: {
@@ -708,25 +705,13 @@ const styles = {
 	},
 	articlesContainer: {
 		display: "flex",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		gap: "10px",
-		backgroundColor: "transparent",
-		border: "1px solid #fff",
-		padding: "10px",
-		borderRadius: "10px",
-		width: "100%",
-		marginBottom: "10px",
-		boxSizing: "border-box",
-		height: "100%",
-	},
-	carouselContainer: {
-		position: "relative",
-		width: "100%",
-		overflow: "hidden",
-		display: "flex",
-		justifyContent: "center",
-		alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: "20px",
+        backgroundColor: "transparent",
+        border: "1px solid #fff",
+        padding: "20px",
+        borderRadius: "10px",
 	},
 	courseItem: {
 		width: "50%",
@@ -739,17 +724,23 @@ const styles = {
 		transition: "opacity 0.5s ease-in-out",
 	},
 	coursesContainer: {
-		flex: 1,
 		display: "flex",
-		flexDirection: "column",
-		backgroundColor: "transparent",
-		borderRadius: "10px",
-		minHeight: "300px",
-		transition: "transform 0.5s ease-in-out",
-		boxSizing: "border-box",
-		width: "calc(100% - 40px)%",
-		alignItems: "center",
-		justifyContent: "center",
+        flexDirection: "column",
+        backgroundColor: "transparent",
+        padding: "20px",
+        borderRadius: "10px",
+        border: "1px solid #fff",
+        width: "calc(100% - 40px)",
+        color: "#000",
+        boxSizing: "border-box",
+        overflow: "hidden",
+        position: "relative",
+	},
+    coursesTitle: {
+		fontSize: "25px",
+		color: "#fff",
+		marginBottom: "10px",
+		textAlign: "center",
 	},
 	aiJobTrend: {
 		backgroundColor: "#01212E",
@@ -778,10 +769,13 @@ const styles = {
 		border: "2px solid #FFFFFF",
 	},
 	articlesCoursesText: {
-		color: "#fff",
-		fontSize: "25px",
-		marginBottom: "0",
-		marginTop: "0",
+		fontSize: '24px',
+        color: '#fff',
+        margin: '0 0 20px 0',  
+        textAlign: 'center',
+        display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
 	},
 	sectionTitle: {
 		fontSize: "24px",
@@ -827,17 +821,24 @@ const styles = {
 		marginRight: "10px",
 		flexShrink: 0,
 	},
+    courseImagePlaceholder: {
+        width: "100%",              
+        height: "150px",
+        backgroundColor: "#f0f0f0",
+        borderRadius: "10px 10px 0 0", 
+        marginBottom: "10px",                   
+        display: "block",
+    },
 	readMoreButton: {
-		marginTop: "auto",
 		backgroundColor: "#000",
-		fontSize: "14px",
-		color: "#fff",
-		border: "none",
-		padding: "8px 12px",
-		borderRadius: "5px",
-		cursor: "pointer",
-		width: "100%",
-		fontFamily: "'Hammersmith One', sans-serif",
+        fontSize: "14px",
+        color: "#fff",
+        border: "none",
+        padding: "8px 12px",
+        borderRadius: "5px",
+        cursor: "pointer",
+        width: "100%",
+        fontFamily: "'Hammersmith One', sans-serif",
 	},
 	jobCard: {
 		background: "linear-gradient(180deg, #1A7270, #31D8D4)",
@@ -851,18 +852,67 @@ const styles = {
 		position: "relative",
 		overflow: "hidden",
 	},
+    courseCarousel: {
+		display: "flex",
+		flexDirection: "row",
+		overflowX: "auto",
+		padding: "10px 0",
+	},
+    carouselWrapper: {
+		display: "flex",
+		overflowX: "auto",
+        alignItems: "center",
+        justifyContent: "center",
+        overflowX: "hidden",
+        boxSizing: "border-box",
+		scrollBehavior: "smooth",
+	},
 	courseCard: {
 		backgroundColor: "#FFFFFF",
 		color: "#000",
-		padding: "20px",
+		padding: "10px",
 		borderRadius: "10px",
 		textAlign: "left",
 		display: "inline-block",
-		width: "80%",
-		minWidth: "300px",
-		margin: "0 20px",
+		width: "300px",
+		margin: "0 10px",
+        flex: "0 0 auto",
 		boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        position: 'relative',
 	},
+    courseInfo: {
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: "14px",
+    },
+    courseTitle: {
+		fontSize: "18px",
+		fontWeight: "bold",
+		marginBottom: "10px",
+	},
+	courseDescription: {
+		fontSize: "14px",
+	},
+    courseFooter: {
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        width: '100%',  
+        paddingTop: '10px', 
+        gap: '10px',
+    },
+    button: {
+        backgroundColor: "#000",
+        fontFamily: "'Hammersmith One', sans-serif",
+        color: "#FFFFFF",
+        border: "none",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        marginTop: "10px",
+        cursor: "pointer",
+        width: '100%',
+        boxSizing: 'border-box',
+    },
 	carouselButton: {
 		position: "absolute",
 		top: "50%",
@@ -870,6 +920,7 @@ const styles = {
 		backgroundColor: "#1A7270",
 		border: "none",
 		borderRadius: "50%",
+        fontSize: "20px",
 		width: "40px",
 		height: "40px",
 		color: "#fff",
