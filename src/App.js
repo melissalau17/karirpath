@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./components/page/HomePage";
 import SignInPage from "./components/page/SignInPage";
 import RegisterPage from "./components/page/RegisterPage";
-import JobResultsPage from "./components/page/JobResultsPage";
+import ResultsPage from "./components/page/ResultsPage";
 import JobsPage from "./components/page/JobsPage";
 import Header from "./components/ui/Header";
+import Footer from "./components/ui/Footer";
 import ProfilePage from "./components/page/ProfilePage";
 import { createClient } from "@supabase/supabase-js";
 import TestPage from "./components/page/TestPage";
@@ -15,24 +16,24 @@ export const supabase = createClient(
 	process.env.REACT_APP_SUPABASE_KEY
 );
 function App() {
-	return (
-		<Router>
-			<div style={styles.container}>
-				<Header />
-				<div style={styles.mainContent}>
-					<Routes>
-						<Route path="/" element={<HomePage />} />
-						<Route path="/signin" element={<SignInPage />} />
-						<Route path="/signup" element={<RegisterPage />} />
-						<Route path="/jobs/:jobTitle" element={<JobResultsPage />} />
-						<Route path="/profile" element={<ProfilePage />} />
-						<Route path="/my-jobs" element={<JobsPage />} />
-						<Route path="/test" element={<TestPage />} />
-					</Routes>
-				</div>
-			</div>
-		</Router>
-	);
+    return (
+        <Router>
+            <div style={styles.container}>
+                <Header />
+                <div style={styles.mainContent}>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/signin" element={<SignInPage />} />
+                        <Route path="/signup" element={<RegisterPage />} />
+                        <Route path="/results" element={<ResultsPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/my-jobs" element={<JobsPage />} />
+                    </Routes>
+                </div>
+                <Footer />
+            </div>
+        </Router>
+    )
 }
 
 const styles = {
