@@ -1,22 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { supabase } from "../../App";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function ResultsPage() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [recentSearches, setRecentSearches] = useState([]);
+function ResultsPage({ data }) {
+	const [searchQuery, setSearchQuery] = useState("");
+	const [recentSearches, setRecentSearches] = useState([]);
 	const [jobResult, setJobResult] = useState([]);
 	const [courses, setCourses] = useState([]);
-    const navigate = useNavigate();
+	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
 
-    const handleSearch = async () => {
-		// Logic for search handling...
+	useEffect(() => {
+		let q = searchParams.get("query");
+		setSearchQuery(q);
+		handleSearch(q);
+	}, []);
+
+	useEffect(() => {}, [searchQuery]);
+
+	const geminiApi = process.env.REACT_APP_GEMINI_API_KEY;
+	const genAI = new GoogleGenerativeAI(geminiApi);
+	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+	const generationConfig = {
+		temperature: 0.5,
+		topP: 0.99,
+		topK: 64,
+		maxOutputTokens: 8192,
+		responseMimeType: "text/plain",
+	};
+	const chatSession = model.startChat({
+		generationConfig,
+		history: [],
+	});
+
+	const handleSearch = async (q) => {
+		const SCHEMA = `CREATE TABLE  public."Country" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NULL,    alpha_2 TEXT NULL,    alpha_3 TEXT NULL,    country_code INTEGER NULL,    iso_3166_2 TEXT NULL,    region TEXT NULL,    sub_region TEXT NULL,    intermediate_region TEXT NULL,    region_code INTEGER NULL,    sub_region_code INTEGER NULL,    intermediate_region_code INTEGER NULL,    CONSTRAINT country_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Industry" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT industry_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Job" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    title TEXT NULL,    description TEXT NULL,    salary_min TEXT NULL,    salary_max TEXT NULL,    id_location BIGINT NULL,    ROLE TEXT NULL,    id_roleclass BIGINT NULL,    id_workplacement BIGINT NULL,    id_worktype BIGINT NULL,    date TIMESTAMP WITH TIME ZONE NULL,    id_industry BIGINT NULL,    id_joblevel BIGINT NULL,    link TEXT NULL,    CONSTRAINT job_pkey PRIMARY KEY (id),    CONSTRAINT job_id_joblevel_fkey FOREIGN KEY (id_joblevel) REFERENCES "JobLevel" (id),    CONSTRAINT job_id_roleclass_fkey FOREIGN KEY (id_roleclass) REFERENCES "RoleClass" (id),    CONSTRAINT job_id_industry_fkey FOREIGN KEY (id_industry) REFERENCES "Industry" (id),    CONSTRAINT job_id_worktype_fkey FOREIGN KEY (id_worktype) REFERENCES "WorkType" (id),    CONSTRAINT job_location_fkey FOREIGN KEY (id_location) REFERENCES "Location" (id) ON UPDATE CASCADE,    CONSTRAINT job_id_workplacement_fkey FOREIGN KEY (id_workplacement) REFERENCES "WorkPlacement" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."JobLevel" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT joblevel_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Location" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    city TEXT NOT NULL,    id_province BIGINT NULL,    id_country BIGINT NULL,    CONSTRAINT location_pkey PRIMARY KEY (id),    CONSTRAINT location_id_country_fkey FOREIGN KEY (id_country) REFERENCES "Country" (id),    CONSTRAINT location_id_province_fkey FOREIGN KEY (id_province) REFERENCES "Province" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Province" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT province_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default; TABLESPACE pg_default;CREATE TABLE  public."WorkPlacement" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NOT NULL,    CONSTRAINT workplacement_pkey PRIMARY KEY (id)  )`;
+		const RULES = `RULES:
+                            1. Output only supabase posgresql query.
+                            2. minimum limit is 5 if asked. never use limit if not asked.
+                            3. maximum limit is 20,
+                            4. always use LIKE and LOWER operator for string matching and always use %%.
+                            5. Table name and column name write with double quotation mark.
+                            6. Maximum usage of WHERE operator is 5.
+                            7. always using SELECT id, title, description, salary_min, salary_max, id_location, id_workplacement, id_worktype, date , id_joblevel, link`;
+		let QUESTION = `QUESTION: ${searchQuery}`;
+		const generatedQuery = await chatSession.sendMessage(
+			`${SCHEMA} \n ${RULES} \n ${q || QUESTION}`
+		);
+		let queryText = generatedQuery.response.text();
+		queryText = queryText.replace(/```/g, "");
+		queryText = queryText.replace("sql", "");
+		console.log(queryText);
+		const dataResult = await supabase.rpc("rcp_execute_sql", {
+			query: queryText,
+		});
+
+		// console.log("dataResult.data");
+		// console.log(dataResult);
+		setJobResult(dataResult.data);
 	};
 
-    const handleSearchInputChange = (event) => setSearchQuery(event.target.value);
+	const handleSearchInputChange = (event) => setSearchQuery(event.target.value);
 
-    const handleKeyDown = (event) => {
+	const handleKeyDown = (event) => {
 		if (event.key === "Enter") handleSearch();
 	};
 
@@ -25,12 +73,14 @@ function ResultsPage() {
 		setRecentSearches(updatedSearches);
 	};
 
-    return (
-        <div style={styles.container}>
-            <main style={styles.main}>
-				<h1 style={styles.headerText}>Results for '{searchQuery || 'Web Designer'}'</h1>
+	return (
+		<div style={styles.container}>
+			<main style={styles.main}>
+				<h1 style={styles.headerText}>
+					Results for '{searchQuery || "Web Designer"}'
+				</h1>
 				<div style={styles.searchBar}>
-					<input 
+					<input
 						type="text"
 						value={searchQuery}
 						onChange={handleSearchInputChange}
@@ -44,16 +94,26 @@ function ResultsPage() {
 				<section style={styles.coursesEnrolledSection}>
 					<h2 style={styles.sectionTitle}>What do you do?</h2>
 					<div style={styles.coursesEnrolled}>
-						{['Design webpage layout', 'Responsive design', 'Website Testing', 'Wireframing & Prototyping', 'User Experience', 'Collaboration'].map((course, index) => (
-							<button key={index} style={styles.courseTag}>{course}</button>
+						{[
+							"Design webpage layout",
+							"Responsive design",
+							"Website Testing",
+							"Wireframing & Prototyping",
+							"User Experience",
+							"Collaboration",
+						].map((course, index) => (
+							<button key={index} style={styles.courseTag}>
+								{course}
+							</button>
 						))}
 					</div>
 				</section>
 
 				<section style={styles.jobOutlookSection}>
 					<p style={styles.jobOutlookText}>
-						The web designer job is projected to grow <b>16%</b> from 2022 to 2032,
-						faster than the average for all occupations. About <b>19,000 openings</b> 
+						The web designer job is projected to grow <b>16%</b> from 2022 to
+						2032, faster than the average for all occupations. About{" "}
+						<b>19,000 openings</b>
 						are projected each year, on average, over the decade.
 					</p>
 				</section>
@@ -67,7 +127,13 @@ function ResultsPage() {
 									<h3>{job.title}</h3>
 									<p>{job.description}</p>
 									<div style={styles.jobActions}>
-										<button style={styles.applyButton}>Apply Now</button>
+										<a
+											href={job.link}
+											target="_blank"
+											style={styles.applyButton}
+										>
+											Apply Now
+										</a>
 										<button style={styles.learnMoreButton}>Learn More</button>
 									</div>
 								</div>
@@ -92,13 +158,13 @@ function ResultsPage() {
 						))}
 					</div>
 				</section>
-            </main>
-        </div>
-    );
+			</main>
+		</div>
+	);
 }
 
 const styles = {
-    container: {
+	container: {
 		display: "flex",
 		width: "100vw",
 		minHeight: "100vh",
@@ -109,7 +175,7 @@ const styles = {
 		color: "#fff",
 		padding: "20px",
 	},
-    main: {
+	main: {
 		flex: 1,
 		display: "flex",
 		flexDirection: "column",
@@ -133,6 +199,7 @@ const styles = {
 		fontSize: "18px",
 		marginRight: "10px",
 		outline: "none",
+		color: "black",
 	},
 	searchIcon: {
 		fontSize: "1.5em",

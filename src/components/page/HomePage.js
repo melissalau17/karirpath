@@ -4,13 +4,11 @@ import logo from "../../assets/karirpath.png";
 import bookmarkIcon from "../../assets/bookmark-icon.png";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../App";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import JobTrendChart from "../ui/charts/JobTrendChart";
 import GraduationTotalChart from "../ui/charts/GraduationTotalChart";
 import JobByLocationChart from "../ui/charts/JobByLocationChart";
-import JobCard from '../ui/JobCard'; 
+import JobCard from "../ui/JobCard";
 import ResultsPage from "../page/ResultsPage";
-
 
 function HomePage() {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -18,20 +16,6 @@ function HomePage() {
 	const [recentSearches, setRecentSearches] = useState([]);
 	const [jobResult, setJobResult] = useState();
 	const [courses, setCourses] = useState();
-	const geminiApi = process.env.REACT_APP_GEMINI_API_KEY;
-	const genAI = new GoogleGenerativeAI(geminiApi);
-	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-	const generationConfig = {
-		temperature: 0,
-		topP: 0.95,
-		topK: 64,
-		maxOutputTokens: 8192,
-		responseMimeType: "text/plain",
-	};
-	const chatSession = model.startChat({
-		generationConfig,
-		history: [],
-	});
 
 	const handleSearchChange = (e) => {
 		setSearchQuery(e.target.value);
@@ -45,31 +29,7 @@ function HomePage() {
 		if (searchQuery.trim() !== "") {
 			setRecentSearches([...recentSearches, searchQuery]);
 			setSearchQuery("");
-			const SCHEMA = `CREATE TABLE  public."Country" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NULL,    alpha_2 TEXT NULL,    alpha_3 TEXT NULL,    country_code INTEGER NULL,    iso_3166_2 TEXT NULL,    region TEXT NULL,    sub_region TEXT NULL,    intermediate_region TEXT NULL,    region_code INTEGER NULL,    sub_region_code INTEGER NULL,    intermediate_region_code INTEGER NULL,    CONSTRAINT country_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Industry" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT industry_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Job" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    title TEXT NULL,    description TEXT NULL,    salary_min TEXT NULL,    salary_max TEXT NULL,    id_location BIGINT NULL,    ROLE TEXT NULL,    id_roleclass BIGINT NULL,    id_workplacement BIGINT NULL,    id_worktype BIGINT NULL,    date TIMESTAMP WITH TIME ZONE NULL,    id_industry BIGINT NULL,    id_joblevel BIGINT NULL,    link TEXT NULL,    CONSTRAINT job_pkey PRIMARY KEY (id),    CONSTRAINT job_id_joblevel_fkey FOREIGN KEY (id_joblevel) REFERENCES "JobLevel" (id),    CONSTRAINT job_id_roleclass_fkey FOREIGN KEY (id_roleclass) REFERENCES "RoleClass" (id),    CONSTRAINT job_id_industry_fkey FOREIGN KEY (id_industry) REFERENCES "Industry" (id),    CONSTRAINT job_id_worktype_fkey FOREIGN KEY (id_worktype) REFERENCES "WorkType" (id),    CONSTRAINT job_location_fkey FOREIGN KEY (id_location) REFERENCES "Location" (id) ON UPDATE CASCADE,    CONSTRAINT job_id_workplacement_fkey FOREIGN KEY (id_workplacement) REFERENCES "WorkPlacement" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."JobLevel" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT joblevel_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Location" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    city TEXT NOT NULL,    id_province BIGINT NULL,    id_country BIGINT NULL,    CONSTRAINT location_pkey PRIMARY KEY (id),    CONSTRAINT location_id_country_fkey FOREIGN KEY (id_country) REFERENCES "Country" (id),    CONSTRAINT location_id_province_fkey FOREIGN KEY (id_province) REFERENCES "Province" (id)  ) TABLESPACE pg_default;CREATE TABLE  public."Province" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    nama TEXT NOT NULL,    CONSTRAINT province_pkey PRIMARY KEY (id)  ) TABLESPACE pg_default; TABLESPACE pg_default;CREATE TABLE  public."WorkPlacement" (    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,    NAME TEXT NOT NULL,    CONSTRAINT workplacement_pkey PRIMARY KEY (id)  )`;
-			const RULES = `RULES:
-                            1. Output only supabase posgresql query.
-                            2. minimum limit is 5 if asked. never use limit if not asked.
-                            3. maximum limit is 20,
-                            4. always use LIKE and LOWER operator for string matching.
-                            5. Table name and column name write with double quotation mark.
-                            6. Maximum usage of WHERE operator is 5.
-                            7. always using SELECT id, title, description, salary_min, salary_max, id_location, id_workplacement, id_worktype, date , id_joblevel, link`;
-			let QUESTION = `QUESTION${searchQuery}`;
-			const generatedQuery = await chatSession.sendMessage(
-				`${SCHEMA} \n ${RULES} \n ${QUESTION}`
-			);
-			let queryText = generatedQuery.response.text();
-			queryText = queryText.replace(/```/g, "");
-			queryText = queryText.replace("sql", "");
-			console.log(queryText);
-			const dataResult = await supabase.rpc("rcp_execute_sql", {
-				query: queryText,
-			});
-
-			console.log("dataResult.data");
-			console.log(dataResult);
-			setJobResult(dataResult.data);
-            navigate(`/results?query=${encodeURIComponent(searchQuery)}`);
+			navigate(`/results?query=${encodeURIComponent(searchQuery)}`);
 		}
 	};
 
@@ -84,13 +44,18 @@ function HomePage() {
 		setRecentSearches(updatedSearches);
 	};
 
-    const [currentIndex, setCurrentIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(0);
 
 	const courseCard = [
-        { title: "Course 1", level: "Beginner", duration: "2h", rating: "4.5/5" },
-        { title: "Course 2", level: "Intermediate", duration: "3h", rating: "4.7/5" },
-        { title: "Course 3", level: "Advanced", duration: "4h", rating: "4.8/5" },
-    ];
+		{ title: "Course 1", level: "Beginner", duration: "2h", rating: "4.5/5" },
+		{
+			title: "Course 2",
+			level: "Intermediate",
+			duration: "3h",
+			rating: "4.7/5",
+		},
+		{ title: "Course 3", level: "Advanced", duration: "4h", rating: "4.8/5" },
+	];
 
 	const articles = [
 		{
@@ -114,17 +79,17 @@ function HomePage() {
 			});
 	}, []);
 
-    const nextCourse = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % courseCard.length);
-    };
+	const nextCourse = () => {
+		setCurrentIndex((prevIndex) => (prevIndex + 1) % courseCard.length);
+	};
 
-    const prevCourse = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? courseCard.length - 1 : prevIndex - 1
-        );
-    };
+	const prevCourse = () => {
+		setCurrentIndex((prevIndex) =>
+			prevIndex === 0 ? courseCard.length - 1 : prevIndex - 1
+		);
+	};
 
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	return (
 		<div style={styles.container}>
@@ -288,36 +253,42 @@ function HomePage() {
 							</div>
 
 							<div style={styles.coursesContainer}>
-                                <h2 style={styles.articlesCoursesText}>Courses For You</h2>
-                                <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevCourse}>
-                                    {"<"}
-                                </button>
-                                <div style={styles.carouselWrapper}>
-                                    <div style={styles.courseCarousel}>
-                                        <div style={styles.courseCard}>
-                                            <div style={styles.courseImagePlaceholder}></div>
-                                            <h2>{courseCard[currentIndex].title}</h2>
-                                            <div style={styles.courseInfo}>
-                                                <span>{courseCard[currentIndex].level}</span>
-                                                <span>{courseCard[currentIndex].duration}</span>
-                                                <span>{courseCard[currentIndex].rating}</span>
-                                            </div>
-                                            <div style={styles.courseFooter}>
-                                                <button style={styles.button}>Go to Website</button>
-                                                <img
-                                                    src={bookmarkIcon}
-                                                    alt="Bookmark"
-                                                    style={styles.bookmarkIcon}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextCourse}>
-                                    {">"}
-                                </button>
-                            </div>
-                        </section>
+								<h2 style={styles.articlesCoursesText}>Courses For You</h2>
+								<button
+									style={{ ...styles.carouselButton, ...styles.leftButton }}
+									onClick={prevCourse}
+								>
+									{"<"}
+								</button>
+								<div style={styles.carouselWrapper}>
+									<div style={styles.courseCarousel}>
+										<div style={styles.courseCard}>
+											<div style={styles.courseImagePlaceholder}></div>
+											<h2>{courseCard[currentIndex].title}</h2>
+											<div style={styles.courseInfo}>
+												<span>{courseCard[currentIndex].level}</span>
+												<span>{courseCard[currentIndex].duration}</span>
+												<span>{courseCard[currentIndex].rating}</span>
+											</div>
+											<div style={styles.courseFooter}>
+												<button style={styles.button}>Go to Website</button>
+												<img
+													src={bookmarkIcon}
+													alt="Bookmark"
+													style={styles.bookmarkIcon}
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<button
+									style={{ ...styles.carouselButton, ...styles.rightButton }}
+									onClick={nextCourse}
+								>
+									{">"}
+								</button>
+							</div>
+						</section>
 					</main>
 				</>
 			) : (
@@ -353,16 +324,16 @@ const styles = {
 		textAlign: "center",
 		marginBottom: "20px",
 	},
-    resultsSection: {
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        padding: '20px',
-        width: '100%',
-        maxWidth: '1200px',
-        margin: '0 auto',
-    },
-    searchBar: {
+	resultsSection: {
+		backgroundColor: "#fff",
+		borderRadius: "8px",
+		boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+		padding: "20px",
+		width: "100%",
+		maxWidth: "1200px",
+		margin: "0 auto",
+	},
+	searchBar: {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
@@ -372,15 +343,15 @@ const styles = {
 		border: "none",
 		borderRadius: "15px",
 	},
-    searchIcon: {
-        cursor: 'pointer',
-        color: '#007BFF',
-    },
+	searchIcon: {
+		cursor: "pointer",
+		color: "#007BFF",
+	},
 	searchInputWrapper: {
 		position: "relative",
 		display: "flex",
 		alignItems: "center",
-        width: "100%",
+		width: "100%",
 	},
 	input: {
 		padding: "10px 40px 10px 20px",
@@ -500,7 +471,7 @@ const styles = {
 		justifyContent: "space-between",
 		position: "relative",
 		overflow: "hidden",
-        gap: '15px',
+		gap: "15px",
 	},
 	jobHeader: {
 		display: "flex",
@@ -528,11 +499,11 @@ const styles = {
 	},
 	companyName: {
 		fontSize: "14px",
-		marginTop: '10px',
+		marginTop: "10px",
 	},
 	jobDescription: {
 		fontSize: "14px",
-        marginBottom: '10px',
+		marginBottom: "10px",
 	},
 	jobFooter: {
 		display: "flex",
@@ -659,13 +630,13 @@ const styles = {
 	},
 	articlesContainer: {
 		display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: "20px",
-        backgroundColor: "transparent",
-        border: "1px solid #fff",
-        padding: "20px",
-        borderRadius: "10px",
+		flexDirection: "column",
+		justifyContent: "center",
+		gap: "20px",
+		backgroundColor: "transparent",
+		border: "1px solid #fff",
+		padding: "20px",
+		borderRadius: "10px",
 	},
 	courseItem: {
 		width: "50%",
@@ -679,19 +650,19 @@ const styles = {
 	},
 	coursesContainer: {
 		display: "flex",
-        flexDirection: "column",
-        backgroundColor: "transparent",
-        padding: "20px",
-        borderRadius: "10px",
-        border: "1px solid #fff",
-        width: "calc(100% - 40px)",
-        color: "#000",
-        boxSizing: "border-box",
-        overflow: "hidden",
-        position: "relative",
-        width: '100%',
+		flexDirection: "column",
+		backgroundColor: "transparent",
+		padding: "20px",
+		borderRadius: "10px",
+		border: "1px solid #fff",
+		width: "calc(100% - 40px)",
+		color: "#000",
+		boxSizing: "border-box",
+		overflow: "hidden",
+		position: "relative",
+		width: "100%",
 	},
-    courseTitle: {
+	courseTitle: {
 		fontSize: "18px",
 		fontWeight: "bold",
 		marginBottom: "10px",
@@ -723,11 +694,11 @@ const styles = {
 		border: "2px solid #FFFFFF",
 	},
 	articlesCoursesText: {
-		fontSize: '24px',
-        color: '#fff',
-        margin: '0 0 20px 0',  
-        textAlign: 'center',
-        display: "flex",
+		fontSize: "24px",
+		color: "#fff",
+		margin: "0 0 20px 0",
+		textAlign: "center",
+		display: "flex",
 		alignItems: "center",
 		justifyContent: "center",
 	},
@@ -775,24 +746,24 @@ const styles = {
 		marginRight: "10px",
 		flexShrink: 0,
 	},
-    courseImagePlaceholder: {
-        width: "100%",              
-        height: "150px",
-        backgroundColor: "#f0f0f0",
-        borderRadius: "10px 10px 0 0", 
-        marginBottom: "10px",                   
-        display: "block",
-    },
+	courseImagePlaceholder: {
+		width: "100%",
+		height: "150px",
+		backgroundColor: "#f0f0f0",
+		borderRadius: "10px 10px 0 0",
+		marginBottom: "10px",
+		display: "block",
+	},
 	readMoreButton: {
 		backgroundColor: "#000",
-        fontSize: "14px",
-        color: "#fff",
-        border: "none",
-        padding: "8px 12px",
-        borderRadius: "5px",
-        cursor: "pointer",
-        width: "100%",
-        fontFamily: "'Hammersmith One', sans-serif",
+		fontSize: "14px",
+		color: "#fff",
+		border: "none",
+		padding: "8px 12px",
+		borderRadius: "5px",
+		cursor: "pointer",
+		width: "100%",
+		fontFamily: "'Hammersmith One', sans-serif",
 	},
 	jobCard: {
 		background: "linear-gradient(180deg, #1A7270, #31D8D4)",
@@ -806,19 +777,19 @@ const styles = {
 		position: "relative",
 		overflow: "hidden",
 	},
-    courseCarousel: {
+	courseCarousel: {
 		display: "flex",
 		flexDirection: "row",
 		overflowX: "auto",
 		padding: "10px 0",
 	},
-    carouselWrapper: {
+	carouselWrapper: {
 		display: "flex",
 		overflowX: "auto",
-        alignItems: "center",
-        justifyContent: "center",
-        overflowX: "hidden",
-        boxSizing: "border-box",
+		alignItems: "center",
+		justifyContent: "center",
+		overflowX: "hidden",
+		boxSizing: "border-box",
 		scrollBehavior: "smooth",
 	},
 	courseCard: {
@@ -830,21 +801,21 @@ const styles = {
 		display: "inline-block",
 		width: "300px",
 		margin: "0 10px",
-        flex: "0 0 auto",
+		flex: "0 0 auto",
 		boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-        position: 'relative',
+		position: "relative",
 	},
-    courseInfo: {
-        display: "flex",
-        justifyContent: "space-between",
-        fontSize: "14px",
-    },
-    courseTitle: {
+	courseInfo: {
+		display: "flex",
+		justifyContent: "space-between",
+		fontSize: "14px",
+	},
+	courseTitle: {
 		fontSize: "18px",
 		fontWeight: "bold",
 		marginBottom: "10px",
 	},
-    coursesTitle: {
+	coursesTitle: {
 		fontSize: "25px",
 		color: "#fff",
 		marginBottom: "10px",
@@ -853,26 +824,26 @@ const styles = {
 	courseDescription: {
 		fontSize: "14px",
 	},
-    courseFooter: {
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        width: '100%',  
-        paddingTop: '10px', 
-        gap: '10px',
-    },
-    button: {
-        backgroundColor: "#000",
-        fontFamily: "'Hammersmith One', sans-serif",
-        color: "#FFFFFF",
-        border: "none",
-        padding: "10px 20px",
-        borderRadius: "5px",
-        marginTop: "10px",
-        cursor: "pointer",
-        width: '100%',
-        boxSizing: 'border-box',
-    },
+	courseFooter: {
+		display: "flex",
+		justifyContent: "space-between",
+		alignItems: "center",
+		width: "100%",
+		paddingTop: "10px",
+		gap: "10px",
+	},
+	button: {
+		backgroundColor: "#000",
+		fontFamily: "'Hammersmith One', sans-serif",
+		color: "#FFFFFF",
+		border: "none",
+		padding: "10px 20px",
+		borderRadius: "5px",
+		marginTop: "10px",
+		cursor: "pointer",
+		width: "100%",
+		boxSizing: "border-box",
+	},
 	carouselButton: {
 		position: "absolute",
 		top: "50%",
@@ -880,7 +851,7 @@ const styles = {
 		backgroundColor: "#1A7270",
 		border: "none",
 		borderRadius: "50%",
-        fontSize: "20px",
+		fontSize: "20px",
 		width: "40px",
 		height: "40px",
 		color: "#fff",
