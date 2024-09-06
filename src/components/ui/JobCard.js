@@ -14,7 +14,7 @@ function JobCard({ title, salary, level, desc, date, link }) {
 				</div>
 				<hr />
 				<div id="body" className="w-full h-28">
-					<div>{date}</div>
+					<div>{date.split("T")[0]}</div>
 					<p className="text-clip text-sm w-full h-full ">{desc}</p>
 				</div>
 			</div>

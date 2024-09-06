@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import logo from "../../assets/karirpath.png";
 import bookmarkIcon from "../../assets/bookmark-icon.png";
@@ -16,6 +16,7 @@ function HomePage() {
 	const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
 	const [recentSearches, setRecentSearches] = useState([]);
 	const [jobResult, setJobResult] = useState();
+	const [courses, setCourses] = useState();
 	const geminiApi = process.env.REACT_APP_GEMINI_API_KEY;
 	const genAI = new GoogleGenerativeAI(geminiApi);
 	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -100,6 +101,15 @@ function HomePage() {
 			id: 2,
 		},
 	];
+
+	useEffect(() => {
+		supabase
+			.from("Course")
+			.select("*")
+			.then((r) => {
+				setCourses(r.data);
+			});
+	}, []);
 
 	const navigate = useNavigate();
 
@@ -205,13 +215,13 @@ function HomePage() {
 
 							<div style={styles.jobsContainer}>
 								<h2 style={styles.jobHeaderText}>Popular Jobs in Indonesia</h2>
-								<div style={styles.filters}>
+								{/* <div style={styles.filters}>
 									<button style={styles.filterButton}>By City</button>
 									<button style={styles.filterButton}>My Jobs</button>
-								</div>
+								</div> */}
 								<div
 									// style={styles.chartPlaceholder}
-									className="border rounded-md"
+									className="border rounded-md h-full"
 								>
 									<JobByLocationChart />
 								</div>
@@ -266,7 +276,7 @@ function HomePage() {
 
 							<div style={styles.articlesContainer}>
 								<h2 style={styles.articlesCoursesText}>Courses</h2>
-								<CourseCarousel courseCard={courseCard} />
+								{courses && <CourseCarousel courseCard={courses} />}
 							</div>
 						</section>
 					</main>
@@ -350,16 +360,24 @@ const CourseCarousel = ({ courseCard }) => {
 			</button>
 			<div style={styles.coursesContainer}>
 				{courseCard.map((course, index) => (
-					<div
-						key={index}
+					<a
+						href={course.url}
+						target="_blank"
 						style={{
 							...styles.courseItem,
 							display: currentIndex === index ? "block" : "none",
 						}}
 					>
-						<h3>{course.title}</h3>
-						<p>{course.description}</p>
-					</div>
+						<div key={index} className="flex flex-col">
+							<div className="flex flex-row">
+								<p className=" text-sm mr-auto">{course.author}</p>
+								<p className=" text-sm ">{course.level}</p>
+							</div>
+							<p>{course.title}</p>
+							<hr />
+							<p>{course.desc}</p>
+						</div>
+					</a>
 				))}
 			</div>
 			<button

@@ -23,7 +23,7 @@ function JobByLocationChart() {
 	}, []);
 
 	return (
-		<div className="bg-teal-100">
+		<div className="bg-teal-100 w-full h-full">
 			{dataset && (
 				<>
 					<Bar
