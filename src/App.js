@@ -10,6 +10,7 @@ import Footer from "./components/ui/Footer";
 import ProfilePage from "./components/page/ProfilePage";
 import { createClient } from "@supabase/supabase-js";
 import TestPage from "./components/page/TestPage";
+import BeAPartner from './components/page/BeAPartner';
 
 export const supabase = createClient(
 	"https://xuufthgrikirrjowtzzy.supabase.co/",
@@ -28,6 +29,7 @@ function App() {
                         <Route path="/results" element={<ResultsPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/my-jobs" element={<JobsPage />} />
+                        <Route path="/be-a-partner" element={<BeAPartner />} />
                     </Routes>
                 </div>
                 <Footer />

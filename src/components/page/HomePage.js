@@ -8,7 +8,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import JobTrendChart from "../ui/charts/JobTrendChart";
 import GraduationTotalChart from "../ui/charts/GraduationTotalChart";
 import JobByLocationChart from "../ui/charts/JobByLocationChart";
-import JobCard from "../ui/JobCard";
+import JobCard from '../ui/JobCard'; 
 import ResultsPage from "../page/ResultsPage";
 
 
@@ -86,16 +86,6 @@ function HomePage() {
 
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const nextCourse = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % courseCard.length);
-    };
-
-    const prevCourse = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? courseCard.length - 1 : prevIndex - 1
-        );
-    };
-
 	const courseCard = [
         { title: "Course 1", level: "Beginner", duration: "2h", rating: "4.5/5" },
         { title: "Course 2", level: "Intermediate", duration: "3h", rating: "4.7/5" },
@@ -124,7 +114,17 @@ function HomePage() {
 			});
 	}, []);
 
-	const navigate = useNavigate();
+    const nextCourse = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % courseCard.length);
+    };
+
+    const prevCourse = () => {
+        setCurrentIndex((prevIndex) =>
+            prevIndex === 0 ? courseCard.length - 1 : prevIndex - 1
+        );
+    };
+
+    const navigate = useNavigate();
 
 	return (
 		<div style={styles.container}>
@@ -177,7 +177,7 @@ function HomePage() {
 											<JobCard
 												title={d.title}
 												salary={`Rp${d.salary_min}-Rp${d.salary_max}`}
-												level={"Intermediete"}
+												level={"Intermediate"}
 												desc={d.description}
 												date={d.date}
 												link={d.link}
@@ -287,14 +287,13 @@ function HomePage() {
 								</div>
 							</div>
 
-<<<<<<< HEAD
 							<div style={styles.coursesContainer}>
                                 <h2 style={styles.articlesCoursesText}>Courses For You</h2>
-                                <div style={styles.carouselContainer}>
-                                    <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevCourse}>
-                                        {"<"}
-                                    </button>
-                                    <div style={styles.carouselWrapper}>
+                                <button style={{ ...styles.carouselButton, ...styles.leftButton }} onClick={prevCourse}>
+                                    {"<"}
+                                </button>
+                                <div style={styles.carouselWrapper}>
+                                    <div style={styles.courseCarousel}>
                                         <div style={styles.courseCard}>
                                             <div style={styles.courseImagePlaceholder}></div>
                                             <h2>{courseCard[currentIndex].title}</h2>
@@ -313,18 +312,12 @@ function HomePage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextCourse}>
-                                        {">"}
-                                    </button>
                                 </div>
+                                <button style={{ ...styles.carouselButton, ...styles.rightButton }} onClick={nextCourse}>
+                                    {">"}
+                                </button>
                             </div>
-=======
-							<div style={styles.articlesContainer}>
-								<h2 style={styles.articlesCoursesText}>Courses</h2>
-								{courses && <CourseCarousel courseCard={courses} />}
-							</div>
->>>>>>> 72b4b92335f848b1a497ef7eaf17d6cedbd501dc
-						</section>
+                        </section>
 					</main>
 				</>
 			) : (
@@ -334,64 +327,6 @@ function HomePage() {
 	);
 }
 
-<<<<<<< HEAD
-=======
-const CourseCarousel = ({ courseCard }) => {
-	const [currentIndex, setCurrentIndex] = useState(0);
-
-	const prevSlide = () => {
-		setCurrentIndex(
-			currentIndex === 0 ? courseCard.length - 1 : currentIndex - 1
-		);
-	};
-
-	const nextSlide = () => {
-		setCurrentIndex(
-			currentIndex === courseCard.length - 1 ? 0 : currentIndex + 1
-		);
-	};
-
-	return (
-		<div style={styles.carouselContainer}>
-			<button
-				style={{ ...styles.carouselButton, ...styles.leftButton }}
-				onClick={prevSlide}
-			>
-				&lt;
-			</button>
-			<div style={styles.coursesContainer}>
-				{courseCard.map((course, index) => (
-					<a
-						href={course.url}
-						target="_blank"
-						style={{
-							...styles.courseItem,
-							display: currentIndex === index ? "block" : "none",
-						}}
-					>
-						<div key={index} className="flex flex-col">
-							<div className="flex flex-row">
-								<p className=" text-sm mr-auto">{course.author}</p>
-								<p className=" text-sm ">{course.level}</p>
-							</div>
-							<p>{course.title}</p>
-							<hr />
-							<p>{course.desc}</p>
-						</div>
-					</a>
-				))}
-			</div>
-			<button
-				style={{ ...styles.carouselButton, ...styles.rightButton }}
-				onClick={nextSlide}
-			>
-				&gt;
-			</button>
-		</div>
-	);
-};
-
->>>>>>> 72b4b92335f848b1a497ef7eaf17d6cedbd501dc
 const styles = {
 	container: {
 		display: "flex",
@@ -418,7 +353,16 @@ const styles = {
 		textAlign: "center",
 		marginBottom: "20px",
 	},
-	searchBar: {
+    resultsSection: {
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+        padding: '20px',
+        width: '100%',
+        maxWidth: '1200px',
+        margin: '0 auto',
+    },
+    searchBar: {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
@@ -428,6 +372,10 @@ const styles = {
 		border: "none",
 		borderRadius: "15px",
 	},
+    searchIcon: {
+        cursor: 'pointer',
+        color: '#007BFF',
+    },
 	searchInputWrapper: {
 		position: "relative",
 		display: "flex",
@@ -539,7 +487,7 @@ const styles = {
 		display: "grid",
 		gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
 		gap: "20px",
-		padding: "20px",
+		padding: "10px",
 	},
 	jobCard: {
 		background: "linear-gradient(180deg, #1A7270, #31D8D4)",
@@ -552,11 +500,11 @@ const styles = {
 		justifyContent: "space-between",
 		position: "relative",
 		overflow: "hidden",
+        gap: '15px',
 	},
 	jobHeader: {
 		display: "flex",
 		justifyContent: "space-between",
-		marginBottom: "10px",
 	},
 	jobTitle: {
 		fontSize: "18px",
@@ -571,7 +519,6 @@ const styles = {
 		height: "1px",
 		backgroundColor: "#FFFFFF",
 		opacity: 0.4,
-		margin: "0",
 	},
 	companyDetails: {
 		flexGrow: 1,
@@ -581,10 +528,11 @@ const styles = {
 	},
 	companyName: {
 		fontSize: "14px",
-		marginBottom: "0",
+		marginTop: '10px',
 	},
 	jobDescription: {
 		fontSize: "14px",
+        marginBottom: '10px',
 	},
 	jobFooter: {
 		display: "flex",
@@ -741,12 +689,12 @@ const styles = {
         boxSizing: "border-box",
         overflow: "hidden",
         position: "relative",
+        width: '100%',
 	},
-    coursesTitle: {
-		fontSize: "25px",
-		color: "#fff",
+    courseTitle: {
+		fontSize: "18px",
+		fontWeight: "bold",
 		marginBottom: "10px",
-		textAlign: "center",
 	},
 	aiJobTrend: {
 		backgroundColor: "#01212E",
@@ -896,6 +844,12 @@ const styles = {
 		fontWeight: "bold",
 		marginBottom: "10px",
 	},
+    coursesTitle: {
+		fontSize: "25px",
+		color: "#fff",
+		marginBottom: "10px",
+		textAlign: "center",
+	},
 	courseDescription: {
 		fontSize: "14px",
 	},
@@ -934,23 +888,12 @@ const styles = {
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
-		zIndex: 1,
 	},
 	leftButton: {
 		left: "10px",
 	},
 	rightButton: {
 		right: "10px",
-	},
-	footer: {
-		textAlign: "center",
-		backgroundColor: "#02353C",
-		padding: "10px 0",
-	},
-	logo: {
-		width: "50px",
-		margin: 0,
-		padding: 0,
 	},
 };
 

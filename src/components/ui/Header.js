@@ -2,11 +2,20 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../../assets/karirpath.png";
 
+
 export const Header = ({ isLoggedIn }) => {
 	const navigate = useNavigate();
 
 	const handleSignInClick = () => {
 		navigate("/signin");
+	};
+
+    const handleBePartnerClick = () => {
+        navigate('/be-a-partner');
+    };
+
+    const handleProfileClick = () => {
+		navigate("/profile");
 	};
 
 	return (
@@ -20,19 +29,26 @@ export const Header = ({ isLoggedIn }) => {
 					<Link to="/my-jobs" style={styles.navLink}>
 						Your Jobs
 					</Link>
+					{isLoggedIn && (
+						<Link to="/profile" style={styles.navLink}>
+							My Profile
+						</Link>
+					)}
 				</nav>
 			</div>
 			<div style={styles.authButtons}>
 				{isLoggedIn ? (
-					<Link to="/profile" style={styles.navLink}>
-						My Profile
-					</Link>
+					null
 				) : (
 					<button onClick={handleSignInClick} style={styles.signInButton}>
 						Sign In
 					</button>
 				)}
-				<button style={styles.partnerButton}>Be a Partner</button>
+				<div>
+                    <button style={styles.partnerButton} onClick={handleBePartnerClick}>
+                        Be a Partner
+                    </button>
+                </div>
 			</div>
 		</header>
 	);

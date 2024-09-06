@@ -1,17 +1,17 @@
 import React from 'react';
 
-function BeaPartner() {
+function BeAPartner() {
     return (
         <div style={styles.container}>
             <div style={styles.formContainer}>
                 <h2 style={styles.title}>Become a Partner</h2>
                 <form style={styles.form}>
                     <div style={styles.formGroup}>
-                        <label htmlFor="name" style={styles.label}>Name:</label>
+                        <label htmlFor="name" style={styles.label}>Company Name:</label>
                         <input type="text" id="name" name="name" style={styles.input} />
                     </div>
                     <div style={styles.formGroup}>
-                        <label htmlFor="email" style={styles.label}>Email:</label>
+                        <label htmlFor="email" style={styles.label}>Company Email:</label>
                         <input type="email" id="email" name="email" style={styles.input} />
                     </div>
                     <div style={styles.formGroup}>
@@ -29,19 +29,27 @@ const styles = {
     container: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         height: '100vh',
-        backgroundColor: '#f5f5f5',
+        width: '100vw',
+        backgroundColor: '#01212E',
+        margin:0,
+        padding: 0,
+        fontFamily: "'Hammersmith One', sans-serif",
+        color: '#fff',
+        paddingTop: '50px',
     },
     formContainer: {
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
         borderRadius: '8px',
         padding: '20px',
         boxShadow: '0 0 10px rgba(0,0,0,0.1)',
         width: '100%',
-        maxWidth: '500px',
+        maxWidth: '600px',
+        border: '1px solid #fff',
     },
     title: {
+        fontSize: '30px',
         textAlign: 'center',
         marginBottom: '20px',
     },
@@ -72,7 +80,7 @@ const styles = {
     },
     submitButton: {
         padding: '10px',
-        backgroundColor: '#007BFF',
+        backgroundColor: '#1A7270',
         color: 'white',
         border: 'none',
         borderRadius: '4px',
@@ -81,4 +89,4 @@ const styles = {
     },
 };
 
-export default BeaPartner;
+export default BeAPartner;
