@@ -1,22 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Image from "../../assets/connect-you.png";
+import supabase from "../auth/supabaseClient";
 
 function SignInPage() {
 	const navigate = useNavigate();
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [error, setError] = useState('');
 
-	const handleSignIn = (event) => {
+	const handleSignIn = async (event) => {
 		event.preventDefault();
-		navigate("/signin");
+
+		try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                setError(error.message);
+                console.error('Error during sign-in:', error.message);
+            } else {
+                console.log('Sign-in successful:', data);
+                navigate('../profile');
+            }
+        } catch (err) {
+            console.error('Unexpected error during sign-in:', err);
+            setError('An unexpected error occurred. Please try again.');
+        }
 	};
 
 	return (
 		<div style={styles.container}>
 			<div style={styles.formSection}>
 				<h1 style={styles.heading}>Welcome Back.</h1>
+				{error && <p style={styles.error}>{error}</p>}
 				<form onSubmit={handleSignIn} style={styles.form}>
-					<input type="email" placeholder="Email" style={styles.input} />
-					<input type="password" placeholder="Password" style={styles.input} />
+					<input type="email" name="email" placeholder="Email" value={email} style={styles.input}  onChange={(e) => setEmail(e.target.value)} />
+					<input type="password" name="password" placeholder="Password" value={password} style={styles.input} onChange={(e) => setPassword(e.target.value)} />
 					<a href="#" style={styles.forgotPassword}>
 						Forget Password?
 					</a>
